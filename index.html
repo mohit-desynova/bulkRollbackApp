@@ -1,0 +1,26 @@
+<!doctype html>
+<html ng-app="bulkRollbackApp">
+	<head>
+		<meta charset="utf-8">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Bulk Rollback</title>
+		<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+	</head>
+	<body ng-controller="bulkRollbackCtrl">
+
+		
+		
+		<script src="bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script src="bower_components/angular/angular.min.js"></script>
+
+
+		<script>
+			angular.module('bulkRollbackApp', [])
+			.controller('bulkRollbackCtrl', ['$scope', function($scope){
+				console.log('bulkRollbackCtrl is loaded');
+			}]);
+		</script>
+	</body>
+</html>
