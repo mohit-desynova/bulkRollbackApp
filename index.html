@@ -24,15 +24,15 @@
 			/* draggable targets */
 			[data-draggable="target"]
 			{
-				float:left;
-				list-style-type:none;
+				/*float:left;*/
+				/*list-style-type:none;*/
 				
-				width:42%;
-				height:7.5em;
-				overflow-y:auto;
+				/*width:42%;*/
+				/*height:7.5em;*/
+				/*overflow-y:auto;*/
 				
-				margin:0 0.5em 0.5em 0;
-				padding:0.5em;
+				/*margin:0 0.5em 0.5em 0;*/
+				/*padding:0.5em;*/
 				
 				border:2px solid #888;
 				border-radius:0.2em;
@@ -61,15 +61,15 @@
 			/* draggable items */
 			[data-draggable="item"]
 			{
-				display:block;
-				list-style-type:none;
+				/*display:block;*/
+				/*list-style-type:none;*/
 				
-				margin:0 0 2px 0;
-				padding:0.2em 0.4em;
+				/*margin:0 0 2px 0;*/
+				/*padding:0.2em 0.4em;*/
 				
 				border-radius:0.2em;
 				
-				line-height:1.3;
+				/*line-height:1.3;*/
 			}
 
 			/* items focus state */
@@ -87,35 +87,82 @@
 				color:#fff;
 			}
 
+/*			[draggable] {
+				-moz-user-select: none;
+				-khtml-user-select: none;
+				-webkit-user-select: none;
+				user-select: none;
+				-khtml-user-drag: element;
+				-webkit-user-drag: element;
+			}
+*/			
+			#bulkSchedular {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				overflow-x: scroll;
+				white-space:nowrap;
+			}
 
+			.entry {
+				margin-right: 5px;
+				display: inline-block;
+				text-align: center;
+				width: 95px;
+				/*float: left;*/
+			}
+
+			.show_entry {
+				background-color: #aaa;
+				padding: 10px;
+				margin-top: 5px;
+				height: 40px;
+				/*cursor: move;*/
+			}
 		</style>
 	</head>
 	<body ng-controller="bulkRollbackCtrl">
+	<!-- <ol data-draggable="target">
+		<li data-draggable="item">Item 0</li>
+		<li data-draggable="item">Item 1</li>
+		<li data-draggable="item">Item 2</li>
+		<li data-draggable="item">Item 3</li>
+	</ol>
+
+	<ol data-draggable="target">
+		<li data-draggable="item">Item 4</li>
+		<li data-draggable="item">Item 5</li>
+	</ol>
+
+	<ol data-draggable="target">
+		<li data-draggable="item">Item 6</li>
+		<li data-draggable="item">Item 7</li>
+	</ol>
+
+	<ol data-draggable="target">
+		<li data-draggable="item">Item 8</li>
+	</ol> -->
 
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-sm-12">
+					<div style="position: relative;">
 					<div id="bulkSchedular">
-						<ol data-draggable="target">
-							<li data-draggable="item">Item 0</li>
-							<li data-draggable="item">Item 1</li>
-							<li data-draggable="item">Item 2</li>
-							<li data-draggable="item">Item 3</li>
-						</ol>
 
-						<ol data-draggable="target">
-							<li data-draggable="item">Item 4</li>
-							<li data-draggable="item">Item 5</li>
-						</ol>
+						<div ng-repeat="entry in showList" class="entry">
+							<div style="background-color: #aaa; padding: 10px;">
+								<span>{{entry.date | date: 'dd MMM yyyy'}}</span> <br>
+								<span>{{entry.day}}</span>
+							</div>
 
-						<ol data-draggable="target">
-							<li data-draggable="item">Item 6</li>
-							<li data-draggable="item">Item 7</li>
-						</ol>
+							<div class="show_entry" data-draggable="target">
+								<div ng-show="entry.program" data-draggable="item">Show {{$index + 1}}</div>
+								<!-- <div ng-show="!entry.program">Empty</div> -->
+							</div>
+						</div>
 
-						<ol data-draggable="target">
-							<li data-draggable="item">Item 8</li>
-						</ol>
+					</div>
 					</div>
 				</div>
 			</div>
@@ -131,17 +178,52 @@
 			.controller('bulkRollbackCtrl', ['$scope', '$timeout', function($scope, $timeout){
 				console.log('bulkRollbackCtrl is loaded');
 
+				// var vm = $scope;
+				$scope.showList = [];
+
 				$timeout(function(){
 					getData();
 				});
 
 				var getData = function(){
-					$.getJSON('data.json', function(data){
+					$.getJSON('data1.json', function(data){
 						console.log('getData ---> ', data);
-					});
-				};
+						$scope.showList = data.data;
+						$scope.$apply();
+						setTimeout(function(){
 
-				//exclude older browsers by the features we need them to support
+
+
+
+
+
+
+
+
+
+
+
+				// Date.prototype.addDays = function(days) {
+				// 	var dat = new Date(this.valueOf())
+				// 	dat.setDate(dat.getDate() + days);
+				// 	return dat;
+				// }
+
+				// function getDates(startDate, stopDate) {
+				// 	var dateArray = new Array();
+				// 	var currentDate = startDate;
+				// 	while (currentDate <= stopDate) {
+				// 		dateArray.push(currentDate)
+				// 		currentDate = currentDate.addDays(1);
+				// 	}
+				// 	return dateArray;
+				// }
+
+				// $scope.dateArray = getDates(new Date('01/01/2017'), new Date('01/30/2017'));
+				// console.log ($scope.dateArray);
+
+				
+								//exclude older browsers by the features we need them to support
 				//and legacy opera explicitly so we don't waste time on a dead browser
 				if
 				(
@@ -726,6 +808,10 @@
 				}, false);
 
 
+						}, 500);
+						console.log('getData ---> ', $scope.showList);
+					});
+				};
 
 			}]);
 		</script>
