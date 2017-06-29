@@ -97,10 +97,6 @@
 			}
 */			
 			#bulkSchedular {
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
 				overflow-x: scroll;
 				white-space:nowrap;
 			}
@@ -110,7 +106,7 @@
 				display: inline-block;
 				text-align: center;
 				width: 95px;
-				/*float: left;*/
+			    vertical-align: top;
 			}
 
 			.show_entry {
@@ -123,31 +119,10 @@
 		</style>
 	</head>
 	<body ng-controller="bulkRollbackCtrl">
-	<!-- <ol data-draggable="target">
-		<li data-draggable="item">Item 0</li>
-		<li data-draggable="item">Item 1</li>
-		<li data-draggable="item">Item 2</li>
-		<li data-draggable="item">Item 3</li>
-	</ol>
-
-	<ol data-draggable="target">
-		<li data-draggable="item">Item 4</li>
-		<li data-draggable="item">Item 5</li>
-	</ol>
-
-	<ol data-draggable="target">
-		<li data-draggable="item">Item 6</li>
-		<li data-draggable="item">Item 7</li>
-	</ol>
-
-	<ol data-draggable="target">
-		<li data-draggable="item">Item 8</li>
-	</ol> -->
 
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-sm-12">
-					<div style="position: relative;">
 					<div id="bulkSchedular">
 
 						<div ng-repeat="entry in showList" class="entry">
@@ -156,13 +131,11 @@
 								<span>{{entry.day}}</span>
 							</div>
 
-							<div class="show_entry" data-draggable="target">
-								<div ng-show="entry.program" data-draggable="item">Show {{$index + 1}}</div>
-								<!-- <div ng-show="!entry.program">Empty</div> -->
+							<div id="target-{{$index}}" class="show_entry" data-draggable="target">
+								<div ng-show="entry.program" id="record-{{$index}}" data-draggable="item">{{entry.program.episode_no}}</div>
 							</div>
 						</div>
 
-					</div>
 					</div>
 				</div>
 			</div>
@@ -175,7 +148,7 @@
 
 		<script>
 			angular.module('bulkRollbackApp', [])
-			.controller('bulkRollbackCtrl', ['$scope', '$timeout', function($scope, $timeout){
+			.controller('bulkRollbackCtrl', ['$scope', '$timeout', '$filter', function($scope, $timeout, $filter){
 				console.log('bulkRollbackCtrl is loaded');
 
 				// var vm = $scope;
@@ -186,22 +159,11 @@
 				});
 
 				var getData = function(){
-					$.getJSON('data1.json', function(data){
+					$.getJSON('response.json', function(data){
 						console.log('getData ---> ', data);
 						$scope.showList = data.data;
 						$scope.$apply();
 						setTimeout(function(){
-
-
-
-
-
-
-
-
-
-
-
 
 				// Date.prototype.addDays = function(days) {
 				// 	var dat = new Date(this.valueOf())
@@ -223,7 +185,7 @@
 				// console.log ($scope.dateArray);
 
 				
-								//exclude older browsers by the features we need them to support
+				//exclude older browsers by the features we need them to support
 				//and legacy opera explicitly so we don't waste time on a dead browser
 				if
 				(
@@ -282,7 +244,7 @@
 					//and if they're not the same container, return to prevent selection
 					else if(selections.owner != item.parentNode)
 					{
-						return;
+						// return; // modified
 					}
 							
 					//set this item's grabbed state
@@ -423,6 +385,7 @@
 				//mousedown event to implement single selection
 				document.addEventListener('mousedown', function(e)
 				{
+					console.log('--- mousedown ---');
 					//if the element is a draggable item
 					if(e.target.getAttribute('draggable'))
 					{
@@ -469,6 +432,7 @@
 				//mouseup event to implement multiple selection
 				document.addEventListener('mouseup', function(e)
 				{
+					console.log('--- mouseup ---');
 					//if the element is a draggable item 
 					//and the multipler selection modifier is pressed
 					if(e.target.getAttribute('draggable') && hasModifier(e))
@@ -500,11 +464,12 @@
 				//dragstart event to initiate mouse dragging
 				document.addEventListener('dragstart', function(e)
 				{
+					console.log('--- dragstart ---');
 					//if the element's parent is not the owner, then block this event
 					if(selections.owner != e.target.parentNode)
 					{
-						e.preventDefault();
-						return;
+						// e.preventDefault(); // modified
+						// return;
 					}
 							
 					//[else] if the multiple selection modifier is pressed 
@@ -536,6 +501,7 @@
 				//keydown event to implement selection and abort
 				document.addEventListener('keydown', function(e)
 				{
+					console.log('--- keydown ---');
 					//if the element is a grabbable item 
 					if(e.target.getAttribute('aria-grabbed'))
 					{
@@ -680,6 +646,7 @@
 				//dragenter event to set that variable
 				document.addEventListener('dragenter', function(e)
 				{
+					console.log('--- dragenter ---');
 					related = e.target;
 
 				}, false);
@@ -687,6 +654,7 @@
 				//dragleave event to maintain target highlighting using that variable
 				document.addEventListener('dragleave', function(e)
 				{
+					console.log('--- dragleave ---');
 					//get a drop target reference from the relatedTarget
 					var droptarget = getContainer(related);
 					
@@ -722,6 +690,7 @@
 				//dragover event to allow the drag by preventing its default
 				document.addEventListener('dragover', function(e)
 				{
+					console.log('--- dragover ---');
 					//if we have any selected items, allow them to be dragged
 					if(selections.items.length)
 					{
@@ -731,20 +700,163 @@
 				}, false);    
 
 
+				function isDropValid(targetIndex, length){
+					for(var i = targetIndex, l = targetIndex + length; i < l; i ++){
+						if($scope.showList[i].program){
+							var flag = false;
+							for(var j = 0, len = selections.items.length; j < len; j ++){
+								console.log($scope.showList[i].program.episode_no != $scope.showList[selections.items[j].id.split('-')[1]].program.episode_no);
+								if($scope.showList[i].program.episode_no == $scope.showList[selections.items[j].id.split('-')[1]].program.episode_no){
+									flag = true;
+									break;
+								}
+							}
+							return flag;
+						}
+					}
+					return true;
+				}
+
+				function locateFirstRecord(){
+					for(var i = 0, l = $scope.showList.length; i < l; i++){
+						if($scope.showList[i].program){
+							return i;
+						}
+					}
+					return null;
+				}
+
+				function locateLastRecord(){
+					for(var i = $scope.showList.length - 1; i > 0; i--){
+						if($scope.showList[i].program){
+							return i;
+						}
+					}
+					return null;
+				}
 
 				//dragend event to implement items being validly dropped into targets,
 				//or invalidly dropped elsewhere, and to clean-up the interface either way
 				document.addEventListener('dragend', function(e)
 				{
+					console.log('--- dragend ---');
 					//if we have a valid drop target reference
 					//(which implies that we have some selected items)
 					if(selections.droptarget)
 					{
+						console.log(selections);
 						//append the selected items to the end of the target container
+						// for(var len = selections.items.length, i = 0; i < len; i ++) // modified
+						// {
+						// 	selections.droptarget.appendChild(selections.items[i]);
+						// }
+
+						// var temp  = $filter('orderBy')(selections.items, 'id', false);
+
+						selections.items.sort(function(a, b) {
+							return (a.id.split('-')[1] - b.id.split('-')[1]); 
+						});
+						console.log(selections.items);
+						
+						var targetLocation = parseInt(selections.droptarget.id.split('-')[1]);
+						console.log($scope.showList[targetLocation]);
+
+						// check drop location is not empty
+						if($scope.showList[targetLocation].program){
+							if(selections.items.length)
+								{
+									clearDropeffects();
+									if(selections.droptarget)
+									{
+										clearSelections();
+										selections.droptarget.className = 
+											selections.droptarget.className.replace(/ dragover/g, '');
+										selections.droptarget = null;
+									}
+								}
+								console.log('before return ---> ', selections);
+							return;
+						}
+
+						// check selected items are in consecutive order
+						for(var len = selections.items.length, i = 1; i < len; i ++)
+						{
+							if(parseInt(selections.items[i].id.split('-')[1]) - parseInt(selections.items[i-1].id.split('-')[1]) != 1){
+								console.log('not consecutive selections !!!');
+								// if we have any selected items
+								if(selections.items.length)
+								{
+									//clear dropeffect from the target containers
+									clearDropeffects();
+								
+									// if we have a valid drop target reference
+									if(selections.droptarget)
+									{
+										//reset the selections array
+										clearSelections();
+
+										//reset the target's dragover class
+										selections.droptarget.className = 
+											selections.droptarget.className.replace(/ dragover/g, '');
+
+										//reset the target reference
+										selections.droptarget = null;
+									}
+								}
+								console.log('before return ---> ', selections);
+								return;
+							}
+						}
+
+						// check selection record date is valid or not
+
+						console.log('first record location ---> ', locateFirstRecord());
+						console.log('targetLocation ---> ', targetLocation);
+						console.log('first record ---> ', $scope.showList[locateFirstRecord()]);
+						console.log('relocation record ---> ', $scope.showList[selections.items[0].id.split('-')[1]]);
+						var firstRecordLocation = locateFirstRecord();
+						var lastRecordLocation = locateLastRecord();
+						var selectedRecordLocation = selections.items[0].id.split('-')[1];
+
+						if(firstRecordLocation != selectedRecordLocation && $scope.showList[firstRecordLocation].date < $scope.showList[selectedRecordLocation].date){
+							// if(locateFirstRecord() < targetLocation)
+							// if we have any selected items
+							console.log('you can not move show here !!!');
+								if(selections.items.length)
+								{
+									//clear dropeffect from the target containers
+									clearDropeffects();
+								
+									// if we have a valid drop target reference
+									if(selections.droptarget)
+									{
+										//reset the selections array
+										clearSelections();
+
+										//reset the target's dragover class
+										selections.droptarget.className = 
+											selections.droptarget.className.replace(/ dragover/g, '');
+
+										//reset the target reference
+										selections.droptarget = null;
+									}
+								}
+								console.log('before return ---> ', selections);
+								return;
+						}
+						
+						console.log('heyyy consecutive selections !!!');
+						
+
 						for(var len = selections.items.length, i = 0; i < len; i ++)
 						{
-							selections.droptarget.appendChild(selections.items[i]);
+							var recordLocation = selections.items[i].id.split('-')[1];
+							console.log($scope.showList[recordLocation]);
+							$scope.showList[targetLocation].program = $scope.showList[recordLocation].program;
+							$scope.showList[recordLocation].program = null;
+							targetLocation++;
 						}
+						$scope.$apply();
 
 						//prevent default to allow the action            
 						e.preventDefault();
@@ -756,7 +868,7 @@
 						//clear dropeffect from the target containers
 						clearDropeffects();
 					
-						//if we have a valid drop target reference
+						// if we have a valid drop target reference
 						if(selections.droptarget)
 						{
 							//reset the selections array
@@ -778,6 +890,7 @@
 				//keydown event to implement items being dropped into targets
 				document.addEventListener('keydown', function(e)
 				{
+					console.log('--- keydown ---');
 					//if the element is a drop target container
 					if(e.target.getAttribute('aria-dropeffect'))
 					{
@@ -800,7 +913,7 @@
 							//reset the selections array
 							clearSelections();
 
-							//prevent default to to avoid any conflict with native actions
+							//prevent default to avoid any conflict with native actions
 							e.preventDefault();
 						}
 					}
