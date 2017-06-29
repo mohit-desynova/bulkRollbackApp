@@ -817,8 +817,8 @@
 						var firstRecordLocation = locateFirstRecord();
 						var lastRecordLocation = locateLastRecord();
 						var selectedRecordLocation = selections.items[0].id.split('-')[1];
-
-						if(firstRecordLocation != selectedRecordLocation && $scope.showList[firstRecordLocation].date < $scope.showList[selectedRecordLocation].date){
+						
+						if(firstRecordLocation != selectedRecordLocation && $scope.showList[firstRecordLocation].date > $scope.showList[targetLocation].date){
 							// if(locateFirstRecord() < targetLocation)
 							// if we have any selected items
 							console.log('you can not move show here !!!');
